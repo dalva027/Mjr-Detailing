@@ -1,0 +1,11 @@
+﻿node_modules
+dist
+.env
+.env.local
+prisma/migrations/.db
+.git
+README.md
+src
+.vscode
+.idea
+*.log
