@@ -61,7 +61,7 @@ export function BookingForm() {
 
     setLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -173,7 +173,7 @@ export function BookingForm() {
                         ? "border-warning focus:border-warning"
                         : "border-hairline focus:border-primary"
                     }
-                    ${loading ? "opacity-50 cursor-not-allowed" : ""}
+                    \${loading ? "opacity-50 cursor-not-allowed" : ""}
                   `}
                 >
                   <option value="">Select a service</option>
