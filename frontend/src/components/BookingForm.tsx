@@ -18,7 +18,7 @@ const services = [
   { value: "mobile-service", label: "Mobile Service" },
   { value: "stain-removal", label: "Stain Removal" },
   { value: "ceramic-coating", label: "Ceramic Coating" },
-  { value: "Other", label: "Other" },
+  { value: "other", label: "Other" },
 ];
 
 export function BookingForm() {
@@ -250,7 +250,7 @@ export function BookingForm() {
             </Button>
 
             <p className="text-xs text-text-muted text-center">
-              We will call you at the provided number to confirm your appointment.
+              We will text you at the provided number to confirm your appointment.
             </p>
           </form>
         </div>

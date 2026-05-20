@@ -68,7 +68,7 @@ export function Hero() {
             </div>
             <div className="w-px h-10 bg-hairline" />
             <div className="flex flex-col">
-              <span className="text-2xl font-light text-text-primary">4</span>
+              <span className="text-2xl font-light text-text-primary">All-Round</span>
               <span className="text-xs text-text-muted mt-1">Services</span>
             </div>
             <div className="w-px h-10 bg-hairline" />

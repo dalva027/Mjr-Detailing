@@ -14,6 +14,7 @@ const appointmentSchema = z.object({
     "mobile-service",
     "stain-removal",
     "ceramic-coating",
+    "other",
   ]),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Invalid date",
