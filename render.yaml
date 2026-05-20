@@ -10,10 +10,11 @@ services:
     branch: main
     buildCommand: |
       cd backend && \
-      npm ci --omit=dev && \
+      npm ci && \
       npx prisma generate && \
       npx tsc && \
-      npx prisma migrate deploy
+      npx prisma migrate deploy && \
+      npm prune --production
     startCommand: cd backend && npm start
     healthCheckPath: /health
     envVars:
