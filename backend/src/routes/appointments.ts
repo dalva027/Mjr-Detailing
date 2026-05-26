@@ -92,15 +92,15 @@ router.post("/", appointmentLimiter, async (req: Request, res: Response) => {
     }
 
     // Send Business SMS
-    try {
-      if (process.env.BUSINESS_PHONE) {
-        await sendAdminSMS(process.env.BUSINESS_PHONE, appointment);
-      } else {
-        console.warn("Admin phone not available, skipping");
-      }
-    } catch (smsError) {
-      console.error("SMS for admin not sent:", smsError);
-    }
+    // try {
+    //   if (process.env.BUSINESS_PHONE) {
+    //     await sendAdminSMS(process.env.BUSINESS_PHONE, appointment);
+    //   } else {
+    //     console.warn("Admin phone not available, skipping");
+    //   }
+    // } catch (smsError) {
+    //   console.error("SMS for admin not sent:", smsError);
+    // }
 
     res.status(201).json(appointment);
   } catch (error) {

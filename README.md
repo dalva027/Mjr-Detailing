@@ -91,5 +91,3 @@ Without textbee.dev credentials, SMS previews are logged to the console.
 - **Phone**: (210) 992-1268
 - **Service Area**: San Antonio, TX
 - **Services**: Exterior Wash & Wax, Mobile Service, Stain Removal, Ceramic Coating
-
-run codex resume 019e3de7-dcd0-7692-afc3-70a31b43b921
