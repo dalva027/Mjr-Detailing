@@ -1,4 +1,4 @@
-interface AppointmentData {
+﻿interface AppointmentData {
   id: string;
   name: string;
   phone: string;
@@ -68,8 +68,23 @@ export async function sendConfirmationSMS(
     month: "long",
     day: "numeric",
   });
-
   const message = `Hi ${appointment.name}! Thanks for booking with Blending with Junior. Your ${serviceName} appointment is scheduled for ${dateStr}. We will text you at ${toPhone} to confirm. Questions? Call (210) 992-1268.`;
+
+  await sendSMS(toPhone, message);
+}
+
+export async function sendAdminSMS(
+  toPhone: string,
+  appointment: AppointmentData
+): Promise<void> {
+  const serviceName = serviceLabels[appointment.service] || appointment.service;
+  const dateStr = appointment.date.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const message = `Hi Junior! ${appointment.name} wants to setup appointment for ${serviceName} @ ${dateStr}. Text them at ${toPhone} to confirm.`;
 
   await sendSMS(toPhone, message);
 }

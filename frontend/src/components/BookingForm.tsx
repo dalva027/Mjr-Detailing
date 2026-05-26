@@ -3,6 +3,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { CheckCircle, Loader2 } from "lucide-react";
+import { createAppointment } from "@/api";
 
 interface BookingFormData {
   name: string;
@@ -61,19 +62,7 @@ export function BookingForm() {
 
     setLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          date: new Date(formData.date).toISOString(),
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to book");
-      }
+      await createAppointment(formData);
 
       setSubmitted(true);
     } catch (err) {

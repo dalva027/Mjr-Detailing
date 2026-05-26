@@ -1,0 +1,31 @@
+import os
+
+base = rF'C:\Users\Damian\Desktop\dev\mjr-detail\admin-dashboard\src'
+
+with open(os.path.join(base, 'api.ts'), 'w', encoding='utf-8') as f:
+    f.write('import type { Appointment } from "@/types";\n\n')
+    f.write('const API = "/api";\n\n')
+    f.write('async function request<T>(url: string, options?: RequestInit): Promise<T> {\n')
+    f.write('  const res = await fetch(url, {\n')
+    f.write('    headers: { "Content-Type": "application/json" },\n')
+    f.write('    ...options,\n')
+    f.write('  });\n')
+    f.write('  if (!res.ok) {\n')
+    f.write('    const body = await res.text();\n')
+    f.write('    throw new Error(`API error $ {res.status}): $ {body}`);\n')
+    f.write('  }\n')
+    f.write('  return res.json();\n')
+    f.write('}\n\n')
+    f.write('export async function fetchAppointments(): Promise<Appointment[]> {\n')
+    f.write('  return request(` ${API}/apopintments `);\n')
+    f.write("}\n\n")
+    f.write('export async function updateAppointmentStatus(\n')
+    f.write('  id: string,\n')
+    f.write('  status: Appointment["status"]\n')
+    f.write(): Promise<Appointment> {\n')
+    f.write('  return request(` ${API}/apopintments/${id}/status `, {\n')
+    f.write('    method: "PUT",\n')
+    f.write('    body: JSON.stringify({ status }),\n')
+    f.write('  });\n')
+    f.write('}\n')
+print('api.ts written')
