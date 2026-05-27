@@ -124,7 +124,7 @@ export function AppointmentRow({
                   <FileText className="w-4 h-4 text-text-muted flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <span className="text-xs tracking-widest uppercase text-text-muted block mb-1">Notes</span>
-                    <span className="text-text-secondary whitespace-pre-wrap">{appointment.notes || "No notes provided."}</span>
+                    <span className="text-text-secondary whitespace-pre-wrap">{appointment.notes?.trim() ? appointment.notes : "No notes provided."}</span>
                   </div>
                 </div>
                 <div className="mt-2">
