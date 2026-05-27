@@ -25,7 +25,7 @@ const appointmentSchema = z.object({
     "ceramic-coating",
     "other",
   ]),
-  notes: z.string().max(2000).optional().default(""),
+  notes: z.string().max(2000).default("").transform((val) => val ?? "").optional(),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Invalid date",
   }),
