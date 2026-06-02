@@ -3,11 +3,14 @@
 export function Hero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background image */}
+      {/* Background video */}
       <div className="absolute inset-0">
-        <img
-          src="/hero.jpg"
-          alt="Blending with Junior - Professional Auto Detailing"
+        <video
+          src="/car_foam_video.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
           className="w-full h-full object-cover"
         />
         {/* Gradient overlay */}
