@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -12,10 +13,37 @@
   --color-text-muted: #666666;
   --color-hairline: #333333;
   --color-success: #03904a;
+  --color-gold: #d4a853;
   --color-warning: #f13a2c;
   --font-sans: "Inter", -apple-system, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --spacing-container: 1280px;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.glow-text {
+  color: #ffffff;
+  text-shadow:
+    0 0 4px #ffffff,
+    0 0 8px #ffffff,
+    0 0 16px #ffffff,
+    0 0 24px #c41e3a,
+    0 0 40px #c41e3a;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.glow-text-dim {
+  color: #ef0129;
+  -webkit-text-stroke: 1px #ed0505;
+  text-shadow:
+    0 0 2px #ffffff3e,
+    0 0 4px #ffffff4c,
+    0 0 8px #c41e3aac;
+  animation: pulse-glow 4s ease-in-out infinite;
 }
 
 html {
