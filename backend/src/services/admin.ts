@@ -26,6 +26,19 @@ export async function verifyAdminEmail(email: string): Promise<{
   return admin;
 }
 
+export async function findAdminById(id: string): Promise<{
+  id: string;
+  email: string;
+  passwordHash: string;
+  refreshToken: string | null;
+} | null> {
+  const admin = await prisma.admin.findUnique({
+    where: { id },
+    select: { id: true, email: true, passwordHash: true, refreshToken: true },
+  });
+  return admin;
+}
+
 export async function updateAdminRefreshToken(id: string, token: string | null): Promise<void> {
   await prisma.admin.update({
     where: { id },

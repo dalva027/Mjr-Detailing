@@ -36,6 +36,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
 
 // Seed default admin on startup
+if (
+  process.env.NODE_ENV === "production" &&
+  (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD)
+) {
+  throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD must be set in production");
+}
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@blendingwithjunior.com";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Admin@1234";
 seedAdmin(ADMIN_EMAIL, ADMIN_PASSWORD).catch(console.error);

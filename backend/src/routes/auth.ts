@@ -10,7 +10,7 @@ import {
   REFRESH_EXPIRES_IN,
 } from '../lib/jwt';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
-import { verifyAdminEmail, updateAdminRefreshToken } from '../services/admin';
+import { verifyAdminEmail, findAdminById, updateAdminRefreshToken } from '../services/admin';
 
 const router = Router();
 const cookieParserMiddleware = cookieParser();
@@ -30,7 +30,7 @@ function setAuthCookies(res: Response, accessToken: string, refreshToken: string
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'none',
     maxAge: 15 * 60 * 1000, // 15 min
-    path: '/api/auth',
+    path: '/api',
   });
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
@@ -90,7 +90,7 @@ router.post('/refresh', (req: Request, res: Response) => {
         return res.status(401).json({ error: 'Invalid refresh token' });
       }
 
-      const admin = await verifyAdminEmail(decoded.id);
+      const admin = await findAdminById(decoded.id);
       if (!admin || admin.refreshToken !== refreshToken) {
         return res.status(401).json({ error: 'Refresh token revoked' });
       }
@@ -119,7 +119,7 @@ router.post('/logout', authMiddleware, (req: AuthRequest, res: Response) => {
     if (req.admin) {
       updateAdminRefreshToken(req.admin.id, null).catch(console.error);
     }
-    res.clearCookie('accessToken', { path: '/api/auth' });
+    res.clearCookie('accessToken', { path: '/api' });
     res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
     res.json({ message: 'Logged out' });
   } catch (error) {

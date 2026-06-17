@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { rateLimit } from "express-rate-limit";
 import { prisma } from "../lib/prisma";
+import { authMiddleware } from "../middleware/auth";
 import {
   sendAdminSMS,
   sendConfirmationSMS,
@@ -40,7 +41,7 @@ const appointmentLimiter = rateLimit({
 });
 
 // GET /api/appointments - List all appointments
-router.get("/", async (_req: Request, res: Response) => {
+router.get("/", authMiddleware, async (_req: Request, res: Response) => {
   try {
     const appointments = await prisma.appointment.findMany({
       orderBy: { date: "asc" },
@@ -53,7 +54,7 @@ router.get("/", async (_req: Request, res: Response) => {
 });
 
 // GET /api/appointments/:id - Get single appointment
-router.get("/:id", async (req: Request, res: Response) => {
+router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
     const appointment = await prisma.appointment.findUnique({
       where: { id: req.params.id as string },
@@ -91,16 +92,16 @@ router.post("/", appointmentLimiter, async (req: Request, res: Response) => {
       console.error("SMS send failed:", smsError);
     }
 
-    // Send Business SMS
-    // try {
-    //   if (process.env.BUSINESS_PHONE) {
-    //     await sendAdminSMS(process.env.BUSINESS_PHONE, appointment);
-    //   } else {
-    //     console.warn("Admin phone not available, skipping");
-    //   }
-    // } catch (smsError) {
-    //   console.error("SMS for admin not sent:", smsError);
-    // }
+    //Send Business SMS
+    try {
+      if (process.env.BUSINESS_PHONE) {
+        await sendAdminSMS(process.env.BUSINESS_PHONE, appointment);
+      } else {
+        console.warn("Admin phone not available, skipping");
+      }
+    } catch (smsError) {
+      console.error("SMS for admin not sent:", smsError);
+    }
 
     res.status(201).json(appointment);
   } catch (error) {
@@ -113,7 +114,7 @@ router.post("/", appointmentLimiter, async (req: Request, res: Response) => {
 });
 
 // PUT /api/appointments/:id/status - Update status
-router.put("/:id/status", async (req: Request, res: Response) => {
+router.put("/:id/status", authMiddleware, async (req: Request, res: Response) => {
   try {
     const { status } = req.body;
     if (!["confirmed", "cancelled", "completed"].includes(status)) {

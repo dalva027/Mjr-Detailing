@@ -26,6 +26,18 @@ services:
         fromDatabase:
           name: mjr-detail-db
           property: connectionString
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: BUSINESS_PHONE
+        sync: false
       - key: TEXTBEE_DEVICE_ID
         sync: false
       - key: TEXTBEE_API_KEY
