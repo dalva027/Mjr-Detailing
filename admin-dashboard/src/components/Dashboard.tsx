@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import type { Appointment } from "@/types";
 import { AppointmentRow } from "./AppointmentRow";
-import { updateAppointmentStatus } from "@/api";
+import { updateAppointmentStatus, deleteAppointment } from "@/api";
 
 interface DashboardProps {
   appointments: Appointment[];
@@ -55,6 +55,26 @@ export function Dashboard({
       onRefresh();
     } catch {
       alert("Failed to update status");
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (
+      !window.confirm(
+        `Delete the appointment for ${name}? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    setUpdating(id);
+    try {
+      await deleteAppointment(id);
+      if (expandedId === id) setExpandedId(null);
+      onRefresh();
+    } catch {
+      alert("Failed to delete appointment");
     } finally {
       setUpdating(null);
     }
@@ -161,8 +181,10 @@ export function Dashboard({
                       key={a.id}
                       appointment={a}
                       expanded={expandedId === a.id}
+                      busy={updating === a.id}
                       onToggle={() => setExpandedId(expandedId === a.id ? null : a.id)}
                       onStatusChange={(s) => handleStatusChange(a.id, s)}
+                      onDelete={() => handleDelete(a.id, a.name)}
                     />
                   ))}
                 </tbody>

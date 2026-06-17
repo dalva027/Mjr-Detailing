@@ -25,17 +25,24 @@ const loginLimiter = rateLimit({
 });
 
 function setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
+  const isProd = process.env.NODE_ENV === 'production';
+  // In prod the admin dashboard and API are on different origins, so cookies
+  // must be SameSite=None + Secure. In dev everything is same-origin via the
+  // Vite proxy over http://localhost, where browsers reject SameSite=None
+  // cookies that aren't also Secure — use Lax so the cookie is actually stored.
+  const sameSite = isProd ? 'none' : 'lax';
+
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
+    secure: isProd,
+    sameSite,
     maxAge: 15 * 60 * 1000, // 15 min
     path: '/api',
   });
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
+    secure: isProd,
+    sameSite,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/api/auth/refresh',
   });

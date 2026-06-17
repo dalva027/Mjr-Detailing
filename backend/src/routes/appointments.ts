@@ -140,4 +140,22 @@ router.put("/:id/status", authMiddleware, async (req: Request, res: Response) =>
   }
 });
 
+// DELETE /api/appointments/:id - Delete appointment
+router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    // deleteMany returns a count instead of throwing when the row is missing,
+    // letting us distinguish "not found" from a real DB error.
+    const { count } = await prisma.appointment.deleteMany({
+      where: { id: req.params.id as string },
+    });
+    if (count === 0) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+    res.json({ message: "Appointment deleted" });
+  } catch (error) {
+    console.error("Error deleting appointment:", error);
+    res.status(500).json({ error: "Failed to delete appointment" });
+  }
+});
+
 export default router;

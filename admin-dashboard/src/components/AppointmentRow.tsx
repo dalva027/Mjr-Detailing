@@ -6,6 +6,7 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
+  Trash2,
 } from "lucide-react";
 import type { Appointment } from "@/types";
 import { SERVICE_LABELS, STATUS_COLORS } from "@/types";
@@ -13,15 +14,19 @@ import { SERVICE_LABELS, STATUS_COLORS } from "@/types";
 interface AppointmentRowProps {
   appointment: Appointment;
   expanded: boolean;
+  busy: boolean;
   onToggle: () => void;
   onStatusChange: (status: Appointment["status"]) => void;
+  onDelete: () => void;
 }
 
 export function AppointmentRow({
   appointment,
   expanded,
+  busy,
   onToggle,
   onStatusChange,
+  onDelete,
 }: AppointmentRowProps) {
   const serviceLabel = SERVICE_LABELS[appointment.service] || appointment.service;
   const statusColors = STATUS_COLORS[appointment.status] || STATUS_COLORS.pending;
@@ -158,6 +163,19 @@ export function AppointmentRow({
                   </div>
                 </div>
               </div>
+            </div>
+            <div className="mt-6 pt-4 border-t border-hairline flex justify-end">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                disabled={busy}
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium tracking-widest uppercase rounded border border-warning/40 text-warning hover:bg-warning/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                {busy ? "Deleting…" : "Delete"}
+              </button>
             </div>
           </td>
         </tr>
