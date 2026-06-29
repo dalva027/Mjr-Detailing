@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Phone } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -20,41 +19,40 @@ export function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
         scrolled || mobileOpen
-          ? "bg-canvas/95 backdrop-blur-md border-b border-hairline"
-          : "bg-transparent"
+          ? "bg-[rgba(8,8,9,0.82)] backdrop-blur-[14px] border-hairline"
+          : "bg-transparent border-transparent"
       }`}>
       <div className="max-w-container mx-auto px-6 h-20 flex items-center justify-between">
-        {/* Logo */}
-        <a
-          href="#"
-          className="no-underline group flex items-center gap-3"
-        >
-          <div className="flex flex-col leading-none">
-            <span className="text-xl md:text-2xl font-medium italic glow-text-dim" style={{ fontFamily: "'Playfair Display', serif" }}>Blending</span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-xs md:text-sm font-light italic text-text-secondary" style={{ fontFamily: "'Playfair Display', serif" }}>with</span>
-              <span className="text-lg md:text-xl font-normal glow-text" style={{ fontFamily: "'Playfair Display', serif" }}>Junior</span>
-            </div>
-          </div>
+        {/* Brand */}
+        <a href="#" className="no-underline flex flex-col leading-none shrink-0">
+          <span className="chrome font-display font-extrabold tracking-[0.04em] text-sm md:text-base">
+            BLENDING WITH JUNIOR
+          </span>
+          <span className="text-[0.5rem] md:text-[0.55rem] font-medium tracking-[0.3em] text-text-muted mt-1.5">
+            PROFESSIONAL AUTO DETAILING
+          </span>
         </a>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden md:flex items-center gap-9">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-xs tracking-widest uppercase text-text-secondary hover:text-text-primary transition-colors duration-200">
+              className="font-display text-[0.82rem] font-medium tracking-[0.08em] text-text-secondary hover:text-text-primary transition-colors duration-200">
               {link.label}
             </a>
           ))}
           <a
             href="tel:+12109921268"
-            className="inline-flex items-center gap-2 text-xs tracking-widest uppercase text-text-secondary hover:text-primary transition-colors duration-200">
-            <Phone className="w-3.5 h-3.5" />
+            className="font-display inline-flex items-center gap-2 text-[0.9rem] font-semibold text-text-primary hover:text-gold transition-colors duration-200">
+            <Phone className="w-4 h-4" />
             (210) 992-1268
+          </a>
+          <a href="#booking" className="btn btn-gold !text-[0.88rem] !py-2.5 !px-5">
+            Book Now
           </a>
         </div>
 
@@ -69,23 +67,29 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-canvas border-b border-hairline">
+        <div className="md:hidden bg-[rgba(8,8,9,0.95)] border-b border-hairline">
           <div className="px-6 py-6 flex flex-col gap-6">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm tracking-widest uppercase text-text-secondary hover:text-text-primary transition-colors duration-200"
+                className="font-display text-sm font-medium tracking-[0.08em] text-text-secondary hover:text-text-primary transition-colors duration-200"
                 onClick={() => setMobileOpen(false)}>
                 {link.label}
               </a>
             ))}
             <a
               href="tel:+12109921268"
-              className="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors duration-200"
+              className="font-display inline-flex items-center gap-2 text-sm font-semibold text-text-secondary hover:text-gold transition-colors duration-200"
               onClick={() => setMobileOpen(false)}>
               <Phone className="w-4 h-4" />
               (210) 992-1268
+            </a>
+            <a
+              href="#booking"
+              className="btn btn-gold self-start"
+              onClick={() => setMobileOpen(false)}>
+              Book Now
             </a>
           </div>
         </div>

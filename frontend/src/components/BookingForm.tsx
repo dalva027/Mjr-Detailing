@@ -15,10 +15,10 @@ interface BookingFormData {
 }
 
 const services = [
-  { value: "exterior-wash-wax", label: "Exterior Wash & Wax/Sealant" },
-  { value: "mobile-service", label: "Mobile Service" },
-  { value: "stain-removal", label: "Stain Removal" },
-  { value: "ceramic-coating", label: "Ceramic Coating" },
+  { value: "interior-detail", label: "Interior Detail" },
+  { value: "exterior-detail", label: "Exterior Detail" },
+  { value: "express-wash", label: "Express Wash" },
+  { value: "machine-wax", label: "Machine Wax" },
   { value: "other", label: "Other" },
 ];
 
@@ -94,8 +94,15 @@ export function BookingForm() {
   }
 
   return (
-    <section id="booking" className="py-24 md:py-32 bg-canvas-elevated">
-      <div className="max-w-container mx-auto px-6">
+    <section id="booking" className="relative overflow-hidden py-24 md:py-32 bg-canvas-2 border-t border-hairline">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(60% 70% at 50% 20%, rgba(200,162,76,0.12), transparent 70%)",
+        }}
+      />
+      <div className="relative z-10 max-w-container mx-auto px-6">
         <div className="max-w-2xl mx-auto">
           <SectionHeading
             tag="Schedule Your Detail"
@@ -155,14 +162,14 @@ export function BookingForm() {
                   onChange={handleChange}
                   disabled={loading}
                   className={`
-                    bg-canvas border text-text-primary px-4 py-3 text-sm
-                    transition-colors duration-200 focus:outline-none focus:ring-1
+                    bg-canvas border rounded-xl text-text-primary px-4 py-3 text-sm
+                    transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-primary/40
                     ${
                       errors.service
                         ? "border-warning focus:border-warning"
                         : "border-hairline focus:border-primary"
                     }
-                    {loading ? "opacity-50 cursor-not-allowed" : ""}
+                    ${loading ? "opacity-50 cursor-not-allowed" : ""}
                   `}
                 >
                   <option value="">Select a service</option>
@@ -194,8 +201,8 @@ export function BookingForm() {
                 required
                 disabled={loading}
                 className={`
-                  bg-canvas border text-text-primary px-4 py-3 text-sm
-                  transition-colors duration-200 focus:outline-none focus:ring-1
+                  bg-canvas border rounded-xl text-text-primary px-4 py-3 text-sm
+                  transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-primary/40
                   ${
                     errors.date
                       ? "border-warning focus:border-warning"
@@ -223,7 +230,7 @@ export function BookingForm() {
                 placeholder="Vehicle type, special requests, etc."
                 rows={4}
                 disabled={loading}
-                className="bg-canvas border border-hairline text-text-primary px-4 py-3 text-sm transition-colors duration-200 focus:outline-none focus:ring-1 focus:border-primary resize-none"
+                className="bg-canvas border border-hairline rounded-xl text-text-primary px-4 py-3 text-sm transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:border-primary resize-none"
               />
             </div>
 

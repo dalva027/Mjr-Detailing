@@ -39,7 +39,7 @@ export function Contact() {
           centered
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-hairline max-w-3xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-hairline max-w-3xl mx-auto rounded-2xl overflow-hidden border border-hairline">
           {contactItems.map((item) => (
             item.href ? (
               <a

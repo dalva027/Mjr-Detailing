@@ -11,44 +11,24 @@ export function SectionHeading({
   title,
   subtitle,
   centered = false,
-  light = false,
 }: SectionHeadingProps) {
   return (
     <div
       className={`
-        flex flex-col gap-3 mb-16
+        flex flex-col gap-4 mb-16
         ${centered ? "items-center text-center" : "items-start"}
       `}
     >
-      <span
-        className={`
-          text-xs tracking-[0.2em] uppercase font-medium
-          ${light ? "text-primary" : "text-primary"}
-        `}
-      >
-        {tag}
-      </span>
-      <h2
-        className={`
-          text-3xl md:text-4xl lg:text-5xl font-light leading-tight
-          ${light ? "text-text-primary" : "text-text-primary"}
-        `}
-      >
+      <span className="eyebrow">{tag}</span>
+      <h2 className="chrome text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.02]">
         {title}
       </h2>
       {subtitle && (
-        <p
-          className={`
-            text-base md:text-lg max-w-2xl leading-relaxed
-            ${light ? "text-text-secondary" : "text-text-secondary"}
-          `}
-        >
+        <p className="text-base md:text-lg max-w-2xl leading-relaxed text-text-secondary">
           {subtitle}
         </p>
       )}
-      {centered && (
-        <div className="w-12 h-px bg-primary mt-2" />
-      )}
+      {centered && <div className="gold-rule w-24 mt-3" />}
     </div>
   );
 }

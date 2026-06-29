@@ -40,8 +40,8 @@ export function Input({
         required={required}
         disabled={disabled}
         className={`
-          bg-canvas border text-text-primary px-4 py-3 text-sm
-          transition-colors duration-200 focus:outline-none focus:ring-1
+          bg-canvas border rounded-xl text-text-primary px-4 py-3 text-sm
+          transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-primary/40
           ${
             error
               ? "border-warning focus:border-warning"
