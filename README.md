@@ -62,7 +62,7 @@ Open http://localhost:5174 in your browser. Log in with the credentials from the
 ### Customer Website (`frontend/`)
 
 - **Hero Section** — Cinematic full-bleed imagery with business tagline
-- **Services** — Showcases 4 services (Exterior Wash & Wax, Mobile Service, Stain Removal, Ceramic Coating)
+- **Services** — Four tiers of care (Express Wash, Exterior Detail, Interior Detail, Machine Wax)
 - **Appointment Booking** — Form with Zod validation, creates appointment + sends SMS confirmation
 - **Contact** — Phone, text, service area info with clickable links
 - **Responsive** — Mobile-first design with hamburger nav
@@ -142,4 +142,4 @@ The project includes a [`render.yaml`](./render.yaml) configuration for one-clic
 - **Name**: Blending with Junior Professional Auto Detailing
 - **Phone**: (210) 992-1268
 - **Service Area**: San Antonio, TX
-- **Services**: Exterior Wash & Wax, Mobile Service, Stain Removal, Ceramic Coating
+- **Services**: Express Wash, Exterior Detail, Interior Detail, Machine Wax

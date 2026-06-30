@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAdmin = createAdmin;
 exports.verifyAdminEmail = verifyAdminEmail;
+exports.findAdminById = findAdminById;
 exports.updateAdminRefreshToken = updateAdminRefreshToken;
 exports.seedAdmin = seedAdmin;
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -12,18 +13,32 @@ const prisma_1 = require("../lib/prisma");
 const SALT_ROUNDS = 12;
 async function createAdmin(email, password) {
     const passwordHash = await bcrypt_1.default.hash(password, SALT_ROUNDS);
-    return prisma_1.prisma.$executeRaw `
-    INSERT INTO "Admin" ("id", "email", "passwordHash", "createdAt", "updatedAt")
-    VALUES (gen_random_uuid(), ${email}, ${passwordHash}, NOW(), NOW())
-  `;
+    await prisma_1.prisma.admin.create({
+        data: {
+            email,
+            passwordHash,
+        },
+    });
 }
 async function verifyAdminEmail(email) {
-    const results = await prisma_1.prisma.$queryRawUnsafe('SELECT "id", "email", "passwordHash", "refreshToken" FROM "Admin" WHERE "email" = $1', email);
-    const rows = results;
-    return rows[0] || null;
+    const admin = await prisma_1.prisma.admin.findUnique({
+        where: { email },
+        select: { id: true, email: true, passwordHash: true, refreshToken: true },
+    });
+    return admin;
+}
+async function findAdminById(id) {
+    const admin = await prisma_1.prisma.admin.findUnique({
+        where: { id },
+        select: { id: true, email: true, passwordHash: true, refreshToken: true },
+    });
+    return admin;
 }
 async function updateAdminRefreshToken(id, token) {
-    await prisma_1.prisma.$executeRawUnsafe('UPDATE "Admin" SET "refreshToken" = $1, "updatedAt" = NOW() WHERE "id" = $2', token, id);
+    await prisma_1.prisma.admin.update({
+        where: { id },
+        data: { refreshToken: token },
+    });
 }
 async function seedAdmin(email, password) {
     const existing = await verifyAdminEmail(email);

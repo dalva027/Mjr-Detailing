@@ -6,29 +6,44 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const express_rate_limit_1 = require("express-rate-limit");
 const jwt_1 = require("../lib/jwt");
 const auth_1 = require("../middleware/auth");
 const admin_1 = require("../services/admin");
 const router = (0, express_1.Router)();
 const cookieParserMiddleware = (0, cookie_parser_1.default)();
+// Rate limiter for login - tight limits to prevent brute force
+const loginLimiter = (0, express_rate_limit_1.rateLimit)({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 attempts per window
+    message: { error: 'Too many login attempts, please try again later.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
 function setAuthCookies(res, accessToken, refreshToken) {
+    const isProd = process.env.NODE_ENV === 'production';
+    // In prod the admin dashboard and API are on different origins, so cookies
+    // must be SameSite=None + Secure. In dev everything is same-origin via the
+    // Vite proxy over http://localhost, where browsers reject SameSite=None
+    // cookies that aren't also Secure — use Lax so the cookie is actually stored.
+    const sameSite = isProd ? 'none' : 'lax';
     res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: isProd,
+        sameSite,
         maxAge: 15 * 60 * 1000, // 15 min
-        path: '/api/auth',
+        path: '/api',
     });
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: isProd,
+        sameSite,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: '/api/auth/refresh',
     });
 }
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -68,7 +83,7 @@ router.post('/refresh', (req, res) => {
             if (!decoded) {
                 return res.status(401).json({ error: 'Invalid refresh token' });
             }
-            const admin = await (0, admin_1.verifyAdminEmail)(decoded.id);
+            const admin = await (0, admin_1.findAdminById)(decoded.id);
             if (!admin || admin.refreshToken !== refreshToken) {
                 return res.status(401).json({ error: 'Refresh token revoked' });
             }
@@ -93,7 +108,7 @@ router.post('/logout', auth_1.authMiddleware, (req, res) => {
         if (req.admin) {
             (0, admin_1.updateAdminRefreshToken)(req.admin.id, null).catch(console.error);
         }
-        res.clearCookie('accessToken', { path: '/api/auth' });
+        res.clearCookie('accessToken', { path: '/api' });
         res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
         res.json({ message: 'Logged out' });
     }

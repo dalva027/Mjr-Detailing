@@ -32,6 +32,10 @@ app.get("/health", (_req, res) => {
 app.use("/api/auth", auth_1.default);
 app.use("/api/appointments", appointments_1.default);
 // Seed default admin on startup
+if (process.env.NODE_ENV === "production" &&
+    (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD)) {
+    throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD must be set in production");
+}
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@blendingwithjunior.com";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Admin@1234";
 (0, admin_1.seedAdmin)(ADMIN_EMAIL, ADMIN_PASSWORD).catch(console.error);

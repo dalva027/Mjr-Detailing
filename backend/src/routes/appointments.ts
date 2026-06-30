@@ -20,10 +20,10 @@ const appointmentSchema = z.object({
     .max(20)
     .regex(/^\+?[\d\s\-()]+$/, "Invalid phone number format"),
   service: z.enum([
-    "exterior-wash-wax",
-    "mobile-service",
-    "stain-removal",
-    "ceramic-coating",
+    "express-wash",
+    "exterior-detail",
+    "interior-detail",
+    "machine-wax",
     "other",
   ]),
   notes: z.string().max(2000).default("").transform((val) => val ?? "").optional(),

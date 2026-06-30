@@ -12,10 +12,10 @@ export interface Appointment {
 }
 
 export const SERVICE_LABELS: Record<string, string> = {
-  "exterior-wash-wax": "Exterior Wash & Wax/Sealant",
-  "mobile-service": "Mobile Service",
-  "stain-removal": "Stain Removal",
-  "ceramic-coating": "Ceramic Coating",
+  "express-wash": "Express Wash",
+  "exterior-detail": "Exterior Detail",
+  "interior-detail": "Interior Detail",
+  "machine-wax": "Machine Wax",
   other: "Other",
 };
 

@@ -1,5 +1,11 @@
-export declare function createAdmin(email: string, password: string): Promise<number>;
+export declare function createAdmin(email: string, password: string): Promise<void>;
 export declare function verifyAdminEmail(email: string): Promise<{
+    id: string;
+    email: string;
+    passwordHash: string;
+    refreshToken: string | null;
+} | null>;
+export declare function findAdminById(id: string): Promise<{
     id: string;
     email: string;
     passwordHash: string;

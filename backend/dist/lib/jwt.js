@@ -11,6 +11,10 @@ exports.verifyRefreshToken = verifyRefreshToken;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'dev-access-secret-change-in-production';
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-change-in-production';
+if (process.env.NODE_ENV === 'production' &&
+    (!process.env.JWT_ACCESS_SECRET || !process.env.JWT_REFRESH_SECRET)) {
+    throw new Error('JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be set in production');
+}
 exports.ACCESS_EXPIRES_IN = '15m';
 exports.REFRESH_EXPIRES_IN = '7d';
 function signAccessToken(payload) {
@@ -18,6 +22,7 @@ function signAccessToken(payload) {
         algorithm: 'HS256',
         expiresIn: exports.ACCESS_EXPIRES_IN,
         subject: payload.id,
+        issuer: 'admin-dashboard',
     });
 }
 function signRefreshToken(id) {
@@ -25,6 +30,7 @@ function signRefreshToken(id) {
         algorithm: 'HS256',
         expiresIn: exports.REFRESH_EXPIRES_IN,
         subject: id,
+        issuer: 'admin-dashboard',
     });
 }
 function verifyAccessToken(token) {

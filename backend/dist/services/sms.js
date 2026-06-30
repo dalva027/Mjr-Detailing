@@ -4,10 +4,11 @@ exports.sendConfirmationSMS = sendConfirmationSMS;
 exports.sendAdminSMS = sendAdminSMS;
 exports.sendStatusUpdateSMS = sendStatusUpdateSMS;
 const serviceLabels = {
-    "exterior-wash-wax": "Exterior Wash & Wax/Sealant",
-    "mobile-service": "Mobile Service",
-    "stain-removal": "Stain Removal",
-    "ceramic-coating": "Ceramic Coating",
+    "express-wash": "Express Wash",
+    "exterior-detail": "Exterior Detail",
+    "interior-detail": "Interior Detail",
+    "machine-wax": "Machine Wax",
+    other: "Other",
 };
 const API_BASE = "https://api.textbee.dev/api/v1";
 async function sendSMS(toPhone, message) {

@@ -4,6 +4,7 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const express_rate_limit_1 = require("express-rate-limit");
 const prisma_1 = require("../lib/prisma");
+const auth_1 = require("../middleware/auth");
 const sms_1 = require("../services/sms");
 const router = (0, express_1.Router)();
 const appointmentSchema = zod_1.z.object({
@@ -15,12 +16,13 @@ const appointmentSchema = zod_1.z.object({
         .max(20)
         .regex(/^\+?[\d\s\-()]+$/, "Invalid phone number format"),
     service: zod_1.z.enum([
-        "exterior-wash-wax",
-        "mobile-service",
-        "stain-removal",
-        "ceramic-coating",
+        "express-wash",
+        "exterior-detail",
+        "interior-detail",
+        "machine-wax",
         "other",
     ]),
+    notes: zod_1.z.string().max(2000).default("").transform((val) => val ?? "").optional(),
     date: zod_1.z.string().refine((val) => !isNaN(Date.parse(val)), {
         message: "Invalid date",
     }),
@@ -33,7 +35,7 @@ const appointmentLimiter = (0, express_rate_limit_1.rateLimit)({
     legacyHeaders: false,
 });
 // GET /api/appointments - List all appointments
-router.get("/", async (_req, res) => {
+router.get("/", auth_1.authMiddleware, async (_req, res) => {
     try {
         const appointments = await prisma_1.prisma.appointment.findMany({
             orderBy: { date: "asc" },
@@ -46,7 +48,7 @@ router.get("/", async (_req, res) => {
     }
 });
 // GET /api/appointments/:id - Get single appointment
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth_1.authMiddleware, async (req, res) => {
     try {
         const appointment = await prisma_1.prisma.appointment.findUnique({
             where: { id: req.params.id },
@@ -71,6 +73,7 @@ router.post("/", appointmentLimiter, async (req, res) => {
                 email: validated.email,
                 phone: validated.phone,
                 service: validated.service,
+                notes: validated.notes ?? "",
                 date: new Date(validated.date),
                 status: "pending",
             },
@@ -82,7 +85,7 @@ router.post("/", appointmentLimiter, async (req, res) => {
         catch (smsError) {
             console.error("SMS send failed:", smsError);
         }
-        // Send Business SMS
+        //Send Business SMS
         try {
             if (process.env.BUSINESS_PHONE) {
                 await (0, sms_1.sendAdminSMS)(process.env.BUSINESS_PHONE, appointment);
@@ -105,7 +108,7 @@ router.post("/", appointmentLimiter, async (req, res) => {
     }
 });
 // PUT /api/appointments/:id/status - Update status
-router.put("/:id/status", async (req, res) => {
+router.put("/:id/status", auth_1.authMiddleware, async (req, res) => {
     try {
         const { status } = req.body;
         if (!["confirmed", "cancelled", "completed"].includes(status)) {
@@ -127,6 +130,24 @@ router.put("/:id/status", async (req, res) => {
     catch (error) {
         console.error("Error updating appointment:", error);
         res.status(500).json({ error: "Failed to update appointment" });
+    }
+});
+// DELETE /api/appointments/:id - Delete appointment
+router.delete("/:id", auth_1.authMiddleware, async (req, res) => {
+    try {
+        // deleteMany returns a count instead of throwing when the row is missing,
+        // letting us distinguish "not found" from a real DB error.
+        const { count } = await prisma_1.prisma.appointment.deleteMany({
+            where: { id: req.params.id },
+        });
+        if (count === 0) {
+            return res.status(404).json({ error: "Appointment not found" });
+        }
+        res.json({ message: "Appointment deleted" });
+    }
+    catch (error) {
+        console.error("Error deleting appointment:", error);
+        res.status(500).json({ error: "Failed to delete appointment" });
     }
 });
 exports.default = router;
