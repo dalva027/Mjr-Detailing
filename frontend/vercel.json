@@ -5,7 +5,7 @@
   "rewrites": [
     { "source": "/robots.txt", "destination": "/robots.txt" },
     { "source": "/sitemap.xml", "destination": "/sitemap.xml" },
-    { "source": "/api/(.*)", "destination": "https://blendingwithjr.com/api/$1" },
+    { "source": "/api/(.*)", "destination": "https://mjr-detailing.onrender.com/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

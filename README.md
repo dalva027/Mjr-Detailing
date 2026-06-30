@@ -133,8 +133,8 @@ Without textbee.dev credentials, SMS previews are logged to the console.
 
 The project includes a [`render.yaml`](./render.yaml) configuration for one-click deployment to [Render](https://render.com):
 
-- **Backend** — Web service (Node.js, starter plan, Oregon region)
-- **Database** — Managed PostgreSQL (starter plan)
+- **Backend** — Web service (Node.js, free plan, Oregon region). Free instances spin down after ~15 min idle, so the first request after a quiet period cold-starts.
+- **Database** — External PostgreSQL on [Neon](https://neon.com) (free tier). Create a Neon project and set its **direct** (non-pooled) connection string — including `?sslmode=require` — as `DATABASE_URL` in the Render dashboard (Service → Environment). The build runs `prisma migrate deploy`, and the API auto-seeds the admin from `ADMIN_EMAIL` / `ADMIN_PASSWORD` on first boot.
 - **Admin Dashboard** — Deploy separately via Vercel (`vercel.json` included)
 
 ## Business Info
