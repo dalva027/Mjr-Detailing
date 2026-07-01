@@ -2,7 +2,8 @@ import { useState } from "react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { CheckCircle, Loader2 } from "lucide-react";
+import { Calendar } from "@/components/ui/Calendar";
+import { CheckCircle, Clock, Loader2 } from "lucide-react";
 import { createAppointment } from "@/api";
 
 interface BookingFormData {
@@ -10,7 +11,8 @@ interface BookingFormData {
   email: string;
   phone: string;
   service: string;
-  date: string;
+  date: string; // "YYYY-MM-DD"
+  time: string; // "HH:mm" (24h)
   notes: string;
 }
 
@@ -22,6 +24,31 @@ const services = [
   { value: "other", label: "Other" },
 ];
 
+// Bookable time slots — business hours in 30-minute increments.
+// Adjust OPEN_HOUR / CLOSE_HOUR / SLOT_MINUTES to change availability.
+const OPEN_HOUR = 8; // first slot at 8:00 AM
+const CLOSE_HOUR = 18; // slots stop before 6:00 PM
+const SLOT_MINUTES = 30;
+
+const pad = (n: number) => String(n).padStart(2, "0");
+const todayKey = () => {
+  const n = new Date();
+  return `${n.getFullYear()}-${pad(n.getMonth() + 1)}-${pad(n.getDate())}`;
+};
+
+const timeSlots: { value: string; label: string }[] = [];
+for (let h = OPEN_HOUR; h < CLOSE_HOUR; h++) {
+  for (let m = 0; m < 60; m += SLOT_MINUTES) {
+    timeSlots.push({
+      value: `${pad(h)}:${pad(m)}`,
+      label: new Date(2000, 0, 1, h, m).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      }),
+    });
+  }
+}
+
 export function BookingForm() {
   const [formData, setFormData] = useState<BookingFormData>({
     name: "",
@@ -29,6 +56,7 @@ export function BookingForm() {
     phone: "",
     service: "",
     date: "",
+    time: "",
     notes: "",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof BookingFormData, string>>>({});
@@ -43,6 +71,29 @@ export function BookingForm() {
     }
   };
 
+  // A slot is unavailable if it's already passed on today's date.
+  const isSlotPast = (slotValue: string): boolean => {
+    if (!formData.date || formData.date !== todayKey()) return false;
+    const [h, m] = slotValue.split(":").map(Number);
+    const now = new Date();
+    return h < now.getHours() || (h === now.getHours() && m <= now.getMinutes());
+  };
+
+  const handleDateChange = (date: string) => {
+    setFormData((prev) => {
+      // Clear a previously chosen time if it's no longer valid for the new date.
+      const clearTime =
+        prev.time && date === todayKey() && isSlotPast(prev.time) ? "" : prev.time;
+      return { ...prev, date, time: clearTime };
+    });
+    setErrors((prev) => ({ ...prev, date: undefined }));
+  };
+
+  const handleTimeChange = (time: string) => {
+    setFormData((prev) => ({ ...prev, time }));
+    setErrors((prev) => ({ ...prev, time: undefined }));
+  };
+
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof BookingFormData, string>> = {};
     if (!formData.name.trim()) newErrors.name = "Name is required";
@@ -52,6 +103,7 @@ export function BookingForm() {
     else if (formData.phone.replace(/\D/g, "").length < 10) newErrors.phone = "Phone must be at least 10 digits";
     if (!formData.service) newErrors.service = "Select a service";
     if (!formData.date) newErrors.date = "Select a date";
+    if (!formData.time) newErrors.time = "Select a time";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -62,7 +114,17 @@ export function BookingForm() {
 
     setLoading(true);
     try {
-      await createAppointment(formData);
+      await createAppointment({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        service: formData.service,
+        // Pin the chosen wall-clock day + time to UTC so it's preserved exactly
+        // end-to-end (DB, admin, SMS) without timezone shifts. Everything reads
+        // this value back in UTC.
+        date: `${formData.date}T${formData.time}:00.000Z`,
+        notes: formData.notes,
+      });
 
       setSubmitted(true);
     } catch (err) {
@@ -73,6 +135,17 @@ export function BookingForm() {
   };
 
   if (submitted) {
+    const when = new Date(
+      `${formData.date}T${formData.time}:00.000Z`
+    ).toLocaleString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: "UTC",
+    });
+
     return (
       <section id="booking" className="py-24 md:py-32">
         <div className="max-w-container mx-auto px-6">
@@ -84,7 +157,9 @@ export function BookingForm() {
               Booking Received
             </h2>
             <p className="text-text-secondary mb-8">
-              Thank you, {formData.name}. We will text you at {formData.phone} to confirm your appointment.
+              Thank you, {formData.name}. Your appointment is requested for{" "}
+              <span className="text-text-primary font-medium">{when}</span>. We
+              will text you at {formData.phone} to confirm.
             </p>
             <Button onClick={() => setSubmitted(false)}>Book Another</Button>
           </div>
@@ -185,34 +260,50 @@ export function BookingForm() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label
-                htmlFor="date"
-                className="text-xs tracking-widest uppercase text-text-secondary"
-              >
-                Preferred Date <span className="text-primary ml-1">*</span>
+            {/* Date & time */}
+            <div className="flex flex-col gap-3">
+              <label className="text-xs tracking-widest uppercase text-text-secondary">
+                Preferred Date &amp; Time <span className="text-primary ml-1">*</span>
               </label>
-              <input
-                id="date"
-                name="date"
-                type="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-                disabled={loading}
-                className={`
-                  bg-canvas border rounded-xl text-text-primary px-4 py-3 text-sm
-                  transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-primary/40
-                  ${
-                    errors.date
-                      ? "border-warning focus:border-warning"
-                      : "border-hairline focus:border-primary"
-                  }
-                `}
-              />
-              {errors.date && (
-                <span className="text-xs text-warning">{errors.date}</span>
-              )}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <Calendar value={formData.date} onChange={handleDateChange} />
+                  {errors.date && (
+                    <span className="mt-2 block text-xs text-warning">{errors.date}</span>
+                  )}
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2 text-xs tracking-widest uppercase text-text-muted mb-3">
+                    <Clock className="w-3.5 h-3.5" />
+                    {formData.date ? "Select a time" : "Pick a date first"}
+                  </div>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-3 gap-2 overflow-y-auto pr-1 max-h-[300px]">
+                    {timeSlots.map((slot) => {
+                      const disabled = loading || !formData.date || isSlotPast(slot.value);
+                      const selected = formData.time === slot.value;
+                      const cls = disabled
+                        ? "border-hairline text-text-muted/40 cursor-not-allowed"
+                        : selected
+                          ? "bg-gradient-to-b from-gold-soft to-gold text-[#171205] border-transparent font-semibold shadow-[0_6px_18px_-8px_rgba(200,162,76,0.7)]"
+                          : "border-hairline text-text-secondary hover:border-primary hover:text-text-primary";
+                      return (
+                        <button
+                          type="button"
+                          key={slot.value}
+                          disabled={disabled}
+                          onClick={() => handleTimeChange(slot.value)}
+                          className={`rounded-xl border py-2.5 text-sm text-center transition-colors duration-150 ${cls}`}
+                        >
+                          {slot.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.time && (
+                    <span className="mt-2 block text-xs text-warning">{errors.time}</span>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">

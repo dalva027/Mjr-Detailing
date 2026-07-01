@@ -31,20 +31,27 @@ export function AppointmentRow({
   const serviceLabel = SERVICE_LABELS[appointment.service] || appointment.service;
   const statusColors = STATUS_COLORS[appointment.status] || STATUS_COLORS.pending;
 
+  // Appointments are date-only and stored at UTC midnight. Format in UTC so the
+  // calendar day matches what the customer picked (and the SMS confirmation),
+  // instead of shifting a day earlier in the admin's local timezone.
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
+      timeZone: "UTC",
     });
   };
 
+  // Match formatDate: the appointment time is a business-local wall-clock stored
+  // at that clock time in UTC, so read it back in UTC to show the booked slot.
   const formatTime = (dateStr: string) => {
     const d = new Date(dateStr);
     return d.toLocaleTimeString("en-US", {
-      hour: "2-digit",
+      hour: "numeric",
       minute: "2-digit",
+      timeZone: "UTC",
     });
   };
 
