@@ -11,51 +11,6 @@ mjr-detail/
 +-- backend/           # Express API (TypeScript + Prisma + PostgreSQL)
 ```
 
-## Quick Start
-
-### 1. Backend
-
-```powershell
-cd backend
-npm install
-```
-
-Set up your `.env` file (copy `.env.example`):
-
-```powershell
-cp .env.example .env
-```
-
-Set up the database:
-
-```powershell
-npx prisma migrate dev --name init
-```
-
-Start the dev server:
-
-```powershell
-npm run dev
-```
-
-### 2. Frontend (Customer Website)
-
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-
-
-### 3. Admin Dashboard
-
-```powershell
-cd admin-dashboard
-npm install
-npm run dev
-```
-
-Open http://localhost:5174 in your browser. Log in with the credentials from the backend `.env` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`).
 
 ## Features
 
